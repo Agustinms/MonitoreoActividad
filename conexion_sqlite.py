@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
+from tkcalendar import *
 import sqlite3
 
 
@@ -13,6 +14,7 @@ root  = Tk()
 root.title("Monitoreo de actividad")
 root.geometry("464x360")
 root.resizable(False,False)
+#cal = Calendar(root, selectmode = 'day')
 
 ###Base de datos###
 
@@ -31,7 +33,7 @@ def conexion_base():
         mi_cursor.execute('''
         CREATE TABLE actividad(
         ID INTEGER PRIMARY KEY AUTOINCREMENT,
-        FECHA DATE NOT NULL,
+        FECHA VARCHAR(50) NOT NULL,
         ACTIVIDAD VARCHAR(50) NOT NULL,
         TIEMPO FLOAT NOT NULL,
         DETALLE VARCHAR(50) NOT NULL
@@ -148,7 +150,22 @@ def borrar():
     limpiarCampos()
     mostrar()
 
+def elegir_fecha(event):
+    global cal, ventana_fecha
+    ventana_fecha = Toplevel()
+    ventana_fecha.grab_set()
+    ventana_fecha.title("Elegir fecha")
+    ventana_fecha.geometry('250x220+590+370')
+    cal = Calendar(ventana_fecha, selectmode="day", date_pattern="dd/mm/yyyy")
+    cal.place(x=0,y=0)
 
+    submit_btn = Button(ventana_fecha, text="Guardar", command=obtener_fecha)
+    submit_btn.place(x=80,y=190)
+
+def obtener_fecha():
+    e2.delete(0,END)
+    e2.insert(0,cal.get_date())
+    ventana_fecha.destroy()
 
 ###Interfaz###
 
@@ -169,6 +186,8 @@ l2 = Label(root, text="Fecha")
 l2.place(x=50, y=10)
 e2 = Entry(root, textvariable=fecha, width=50)
 e2.place(x=100, y=10)
+#e2.insert(0, "dd/mm/yyyy")
+e2.bind("<1>", elegir_fecha)
 
 l3 = Label(root, text="Actividad")
 l3.place(x=220, y=10)
